@@ -1,0 +1,119 @@
+{
+    "users": [
+        {
+            "id": "user-buyer-1",
+            "email": "buyer@example.com",
+            "phone": "+1-202-555-0148",
+            "hashedPassword": "hash:buyer-pass",
+            "name": "Buyer One",
+            "roles": [
+                "BUYER"
+            ],
+            "status": "ACTIVE",
+            "createdAt": "2024-01-01T10:00:00Z"
+        },
+        {
+            "id": "user-seller-1",
+            "email": "seller@example.com",
+            "phone": "+1-202-555-0172",
+            "hashedPassword": "hash:seller-pass",
+            "name": "Seller One",
+            "roles": [
+                "SELLER"
+            ],
+            "status": "ACTIVE",
+            "createdAt": "2024-01-01T10:05:00Z"
+        }
+    ],
+    "products": [
+        {
+            "id": "prod-iphone-15",
+            "sellerId": "user-seller-1",
+            "title": "iPhone 15",
+            "description": "Flagship phone in great condition",
+            "price": 699.0,
+            "stock": 10,
+            "category": "phones",
+            "status": "ACTIVE",
+            "createdAt": "2024-01-02T12:00:00Z"
+        },
+        {
+            "id": "prod-case-1",
+            "sellerId": "user-seller-1",
+            "title": "Slim Case",
+            "description": "Matte black protective case",
+            "price": 29.0,
+            "stock": 50,
+            "category": "accessories",
+            "status": "ACTIVE",
+            "createdAt": "2024-01-02T12:10:00Z"
+        }
+    ],
+    "orders": [
+        {
+            "id": "order-1001",
+            "buyerId": "user-buyer-1",
+            "items": [
+                {
+                    "productId": "prod-iphone-15",
+                    "titleSnapshot": "iPhone 15",
+                    "priceSnapshot": 699.0,
+                    "quantity": 1,
+                    "sellerId": "user-seller-1"
+                },
+                {
+                    "productId": "prod-case-1",
+                    "titleSnapshot": "Slim Case",
+                    "priceSnapshot": 29.0,
+                    "quantity": 2,
+                    "sellerId": "user-seller-1"
+                }
+            ],
+            "amount": 757.0,
+            "status": "PAID",
+            "paymentId": "payment-1001",
+            "createdAt": "2024-01-05T15:30:00Z",
+            "updatedAt": "2024-01-05T15:35:00Z"
+        },
+        {
+            "id": "order-1002",
+            "buyerId": "user-buyer-1",
+            "items": [
+                {
+                    "productId": "prod-case-1",
+                    "titleSnapshot": "Slim Case",
+                    "priceSnapshot": 29.0,
+                    "quantity": 1,
+                    "sellerId": "user-seller-1"
+                }
+            ],
+            "amount": 29.0,
+            "status": "PENDING",
+            "paymentId": null,
+            "createdAt": "2024-01-07T11:00:00Z",
+            "updatedAt": "2024-01-07T11:00:00Z"
+        }
+    ],
+    "payments": [
+        {
+            "id": "payment-1001",
+            "orderId": "order-1001",
+            "method": "DEBIT",
+            "amount": 757.0,
+            "status": "SUCCESS",
+            "transactionId": "txn-2001",
+            "createdAt": "2024-01-05T15:32:00Z"
+        }
+    ],
+    "reviews": [
+        {
+            "id": "review-5001",
+            "orderId": "order-1001",
+            "productId": "prod-iphone-15",
+            "buyerId": "user-buyer-1",
+            "rating": 5,
+            "comment": "Fantastic phone, fast shipping.",
+            "createdAt": "2024-01-10T09:00:00Z"
+        }
+    ]
+}
