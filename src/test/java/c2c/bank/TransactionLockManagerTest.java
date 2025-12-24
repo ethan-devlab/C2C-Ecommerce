@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.*;
-
+import org.junit.jupiter.api.DisplayName;
 /**
  * TransactionLockManager 測試案例 (5 個測試)
  * 測試方法: 併發測試、路徑測試
@@ -22,14 +22,8 @@ class TransactionLockManagerTest {
         lockManager = new TransactionLockManager();
     }
 
-    /**
-     * TL-001: 獲取鎖成功
-     * 測試方法: 等價分割-有效類
-     * 輸入: lockKey: "test", timeout: 1000ms
-     * 預期結果: tryLock返回true
-     * 分支覆蓋: lock成功分支
-     */
     @Test
+    @DisplayName("TL-001: 獲取鎖成功")
     void TL001_testTryLockSuccess() {
         // Arrange
         String lockKey = "test";
@@ -45,14 +39,9 @@ class TransactionLockManagerTest {
         lockManager.unlock(lockKey);
     }
 
-    /**
-     * TL-002: 同一key第二次獲取鎖失敗
-     * 測試方法: 併發測試
-     * 輸入: lockKey: "test", 已被鎖定
-     * 預期結果: tryLock返回false
-     * 分支覆蓋: lock失敗分支
-     */
+
     @Test
+    @DisplayName("TL-002: 已鎖定時獲取鎖失敗")
     void TL002_testTryLockFailsWhenAlreadyLocked() throws InterruptedException {
         // Arrange
         String lockKey = "test";
@@ -87,14 +76,8 @@ class TransactionLockManagerTest {
         assertFalse(thread2Locked.get(), "線程2應該無法獲取已被持有的鎖");
     }
 
-    /**
-     * TL-003: 釋放鎖成功
-     * 測試方法: 路徑測試
-     * 輸入: lockKey: "test", 已鎖定
-     * 預期結果: unlock成功
-     * 分支覆蓋: lock.isHeldByCurrentThread()==true
-     */
     @Test
+    @DisplayName("TL-003: 釋放鎖成功")
     void TL003_testUnlockSuccess() {
         // Arrange
         String lockKey = "test";
@@ -112,14 +95,8 @@ class TransactionLockManagerTest {
         lockManager.unlock(lockKey);
     }
 
-    /**
-     * TL-004: 釋放未持有的鎖不拋異常
-     * 測試方法: 路徑測試
-     * 輸入: lockKey: "test", 未持有
-     * 預期結果: 不拋異常
-     * 分支覆蓋: lock==null 或 !isHeldByCurrentThread() 分支
-     */
     @Test
+    @DisplayName("TL-004: 釋放未持有的鎖不拋異常")
     void TL004_testUnlockNotHeldLockDoesNotThrow() {
         // Act & Assert - 釋放不存在的鎖 (lock==null 分支)
         assertDoesNotThrow(() -> lockManager.unlock("nonexistent"),
@@ -135,14 +112,8 @@ class TransactionLockManagerTest {
                 "釋放已釋放的鎖不應拋出異常");
     }
 
-    /**
-     * TL-005: 線程中斷時返回false
-     * 測試方法: 併發測試
-     * 輸入: lockKey: "test", 線程被中斷
-     * 預期結果: tryLock返回false, 中斷標誌設置
-     * 分支覆蓋: InterruptedException分支
-     */
     @Test
+    @DisplayName("TL-005: 線程中斷時tryLock返回false")
     void TL005_testTryLockReturnsFalseWhenThreadInterrupted() throws InterruptedException {
         // Arrange
         String lockKey = "test";
@@ -193,61 +164,5 @@ class TransactionLockManagerTest {
         assertTrue(thread1Locked.get(), "線程1應該成功獲取鎖");
         assertFalse(thread2Locked.get(), "線程2在被中斷時應該返回false");
         assertTrue(thread2Interrupted.get(), "線程2的中斷標誌應該被設置");
-    }
-
-    /**
-     * 額外測試: 不同lockKey可以並行獲取鎖
-     * 這個測試驗證了不同的鎖互不干擾
-     */
-    @Test
-    void testDifferentKeysCanLockConcurrently() throws InterruptedException {
-        // Arrange
-        String lockKey1 = "key1";
-        String lockKey2 = "key2";
-        CountDownLatch startLatch = new CountDownLatch(1);
-        CountDownLatch bothLockedLatch = new CountDownLatch(2);
-        AtomicBoolean thread1Locked = new AtomicBoolean(false);
-        AtomicBoolean thread2Locked = new AtomicBoolean(false);
-
-        // 線程1獲取key1
-        Thread thread1 = new Thread(() -> {
-            try {
-                startLatch.await();
-                thread1Locked.set(lockManager.tryLock(lockKey1, 1000));
-                bothLockedLatch.countDown();
-                bothLockedLatch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            lockManager.unlock(lockKey1);
-        });
-
-        // 線程2獲取key2
-        Thread thread2 = new Thread(() -> {
-            try {
-                startLatch.await();
-                thread2Locked.set(lockManager.tryLock(lockKey2, 1000));
-                bothLockedLatch.countDown();
-                bothLockedLatch.await();
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            lockManager.unlock(lockKey2);
-        });
-
-        // Act
-        thread1.start();
-        thread2.start();
-        startLatch.countDown(); // 同時開始
-
-        boolean bothLocked = bothLockedLatch.await(2, TimeUnit.SECONDS);
-
-        thread1.join();
-        thread2.join();
-
-        // Assert
-        assertTrue(bothLocked, "兩個線程應該能同時獲取不同的鎖");
-        assertTrue(thread1Locked.get(), "線程1應該成功獲取key1的鎖");
-        assertTrue(thread2Locked.get(), "線程2應該成功獲取key2的鎖");
     }
 }

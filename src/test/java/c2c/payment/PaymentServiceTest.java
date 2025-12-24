@@ -64,6 +64,7 @@ class PaymentServiceTest {
         lockManager = new TransactionLockManager();
     }
 
+    //初始設置訂單
     private Order setupOrder(String buyerId, double price, int quantity) {
         var product = productService.create("seller", "Phone", "desc", price, quantity, "cat").getData();
         cartService.addItem(buyerId, product.getId(), 1);
@@ -71,7 +72,6 @@ class PaymentServiceTest {
         return orderService.createFromCart(buyerId).getData();
     }
 
-    // PS-P-001: 等價分割-有效類 - 支付成功 DEBIT方式
     @Test
     @DisplayName("PS-P-001: 等價分割-有效類 - 支付成功 DEBIT方式")
     void PS001_testPaySuccessWithDebitMethod() {
@@ -91,7 +91,6 @@ class PaymentServiceTest {
         assertEquals(TransactionStatus.DEBITED, logRepo.findAll().get(0).getStatus());
     }
 
-    // PS-P-002: 等價分割-有效類 - 支付成功 CREDIT方式
     @Test
     @DisplayName("PS-P-002: 等價分割-有效類 - 支付成功 CREDIT方式")
     void PS002_testPaySuccessWithCreditMethod() {
@@ -109,7 +108,6 @@ class PaymentServiceTest {
         assertEquals(OrderStatus.PAID, orderRepository.findById(order.getId()).orElseThrow().getStatus());
     }
 
-    // PS-P-003: 等價分割-無效類 - 支付失敗 訂單不存在
     @Test
     @DisplayName("PS-P-003: 等價分割-無效類 - 支付失敗 訂單不存在")
     void PS003_testPayFailsWhenOrderNotFound() {
@@ -124,7 +122,6 @@ class PaymentServiceTest {
         assertTrue(exception.getMessage().contains("order not found"));
     }
 
-    // PS-P-004: 等價分割-無效類 - 支付失敗 訂單狀態非PENDING
     @Test
     @DisplayName("PS-P-004: 等價分割-無效類 - 支付失敗 訂單狀態非PENDING")
     void PS004_testPayFailsWhenOrderStatusNotPending() {
@@ -145,7 +142,6 @@ class PaymentServiceTest {
         assertTrue(exception.getMessage().contains("order not payable"));
     }
 
-    // PS-P-005: 併發測試 - 支付失敗 鎖定超時
     @Test
     @DisplayName("PS-P-005: 併發測試 - 支付失敗 鎖定超時")
     void PS005_testPayFailsWhenLockTimeout() throws InterruptedException {
@@ -178,7 +174,6 @@ class PaymentServiceTest {
         t.join();
     }
 
-    // PS-P-006: 等價分割-無效類 - 支付失敗 餘額不足
     @Test
     @DisplayName("PS-P-006: 等價分割-無效類 - 支付失敗 餘額不足")
     void PS006_testPayFailsOnInsufficientBalance() {
@@ -197,7 +192,6 @@ class PaymentServiceTest {
         assertEquals(TransactionStatus.FAILED, logRepo.findAll().get(0).getStatus());
     }
 
-    // PS-P-007: 等價分割-無效類 - 支付失敗 扣款失敗
     @Test
     @DisplayName("PS-P-007: 等價分割-無效類 - 支付失敗 扣款失敗")
     void PS007_testPayFailsWhenBankDebitFails() {
@@ -218,7 +212,6 @@ class PaymentServiceTest {
         assertEquals(TransactionStatus.FAILED, logRepo.findAll().get(0).getStatus());
     }
 
-    // PS-P-008: 路徑測試 - 支付成功後交易記錄正確
     @Test
     @DisplayName("PS-P-008: 路徑測試 - 支付成功後交易記錄正確")
     void PS008_testTransactionLogRecordedOnSuccess() {
@@ -239,7 +232,6 @@ class PaymentServiceTest {
         assertEquals(100.0, transaction.getAmount());
     }
 
-    // PS-P-009: 路徑測試 - 餘額不足時交易記錄正確
     @Test
     @DisplayName("PS-P-009: 路徑測試 - 餘額不足時交易記錄正確")
     void PS009_testTransactionLogRecordedOnInsufficientBalance() {
@@ -259,7 +251,6 @@ class PaymentServiceTest {
         assertEquals("insufficient balance", transaction.getMessage());
     }
 
-    // PS-P-010: 路徑測試 - 扣款失敗時交易記錄正確
     @Test
     @DisplayName("PS-P-010: 路徑測試 - 扣款失敗時交易記錄正確")
     void PS010_testTransactionLogRecordedOnDebitFailure() {
@@ -281,7 +272,6 @@ class PaymentServiceTest {
         assertEquals("debit failed", transaction.getMessage());
     }
 
-    // PS-P-011: 路徑測試 - 支付成功後訂單paymentId正確設置
     @Test
     @DisplayName("PS-P-011: 路徑測試 - 支付成功後訂單paymentId正確設置")
     void PS011_testOrderPaymentIdSetCorrectly() {
@@ -299,7 +289,6 @@ class PaymentServiceTest {
         assertNotNull(updatedOrder.getPaymentId());
     }
 
-    // PS-P-012: 併發測試 - 兩個線程同時支付不同卡號成功
     @Test
     @DisplayName("PS-P-012: 併發測試 - 兩個線程同時支付不同卡號成功")
     void PS012_testConcurrentPaymentsWithDifferentCardsSucceed() throws InterruptedException {
@@ -346,7 +335,6 @@ class PaymentServiceTest {
         assertEquals(2, logRepo.findAll().stream().filter(t -> t.getStatus() == TransactionStatus.DEBITED).count());
     }
 
-    // PS-P-013: 併發測試 - 鎖定後finally確保釋放
     @Test
     @DisplayName("PS-P-013: 併發測試 - 鎖定後finally確保釋放")
     void PS013_testLockReleasedInFinallyBlockOnException() {
