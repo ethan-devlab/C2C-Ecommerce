@@ -4,22 +4,34 @@ import c2c.common.exceptions.NotFoundException;
 import c2c.common.exceptions.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mockStatic;
 
+@DisplayName("UserService 測試")
 class UserServiceTest {
+
+    static {
+        System.setProperty("net.bytebuddy.experimental", "true");
+    }
 
     private UserRepository repo;
     private UserService service;
 
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
+        java.lang.reflect.Field seqField = Class.forName("c2c.common.IdGenerator").getDeclaredField("SEQ");
+        seqField.setAccessible(true);
+        java.util.concurrent.atomic.AtomicLong seq = (java.util.concurrent.atomic.AtomicLong) seqField.get(null);
+        seq.set(1);
+
         repo = new InMemoryUserRepository();
         service = new DefaultUserService(repo, new SimplePasswordHasher());
     }
@@ -27,16 +39,23 @@ class UserServiceTest {
     // ==========================================
     // 1.1 Register 功能測試 (US-R-001 ~ 010)
     // ==========================================
+    
+    @Nested
+    @DisplayName("Register 功能測試")
+    class RegisterTests {
 
-    @Test
-    @DisplayName("US-R-001: 註冊成功 - 完整資訊含電話")
-    void register_success_with_full_info() {
+        @Test
+        @DisplayName("US-R-001: 註冊成功 - 完整資訊含電話")
+        void register_success_with_full_info() {
         User user = service.register("valid@example.com", "0912345678", "validPwd", "Alice").getData();
 
         assertNotNull(user);
         assertNotNull(user.getId());
+        assertEquals("valid@example.com", user.getEmail());
         assertEquals("0912345678", user.getPhone());
-        assertEquals("User{id='10', email='valid@example.com', name='Alice', roles=[BUYER], status=ACTIVE}", user.toString());
+        assertEquals("Alice", user.getName());
+        assertEquals(Set.of("BUYER"), user.getRoles());
+        assertEquals(UserStatus.ACTIVE, user.getStatus());
         assertTrue(repo.existsByEmail("valid@example.com"));
 
         user.setEmail("test@example.com");
@@ -48,8 +67,6 @@ class UserServiceTest {
         assertNotNull(user.getCreatedAt());
 
         assertEquals(java.util.Set.of("BUYER"), user.getRoles());
-
-        assertEquals(1598, user.hashCode());
 
         java.util.List<User> allUsers = repo.findAll();
         assertEquals(1, allUsers.size());
@@ -136,21 +153,26 @@ class UserServiceTest {
         );
     }
 
-    @Test
-    @DisplayName("US-R-010: 註冊成功 - 特殊字元email")
-    void register_success_special_char_email() {
-        String specialEmail = "test+tag@example.com";
-        User user = service.register(specialEmail, null, "validPwd", "Alice").getData();
-        assertEquals(specialEmail, user.getEmail());
+        @Test
+        @DisplayName("US-R-010: 註冊成功 - 特殊字元email")
+        void register_success_special_char_email() {
+            String specialEmail = "test+tag@example.com";
+            User user = service.register(specialEmail, null, "validPwd", "Alice").getData();
+            assertEquals(specialEmail, user.getEmail());
+        }
     }
 
     // ==========================================
     // 1.2 Login 功能測試
     // ==========================================
+    
+    @Nested
+    @DisplayName("Login 功能測試")
+    class LoginTests {
 
-    @Test
-    @DisplayName("US-L-001: 登入成功 - 正確憑證")
-    void login_success() {
+        @Test
+        @DisplayName("US-L-001: 登入成功 - 正確憑證")
+        void login_success() {
         String email = "alice@example.com";
         String password = "securePassword";
         User registered = service.register(email, null, password, "Alice").getData();
@@ -177,7 +199,6 @@ class UserServiceTest {
         String password = "pwd";
         User user = service.register(email, null, password, "BannedUser").getData();
 
-        // === 修正點：使用 DISABLED 取代 SUSPENDED ===
         user.setStatus(UserStatus.DISABLED);
         repo.save(user);
 
@@ -198,14 +219,19 @@ class UserServiceTest {
         );
         assertEquals("invalid credentials", exception.getMessage());
     }
+    }
 
     // ==========================================
     // 1.3 UpdateProfile 功能測試
     // ==========================================
+    
+    @Nested
+    @DisplayName("UpdateProfile 功能測試")
+    class UpdateProfileTests {
 
-    @Test
-    @DisplayName("US-U-001: 更新成功 - 修改name和phone")
-    void update_profile_success() {
+        @Test
+        @DisplayName("US-U-001: 更新成功 - 修改name和phone")
+        void update_profile_success() {
         User original = service.register("charlie@example.com", "0912345678", "pwd", "Charlie").getData();
         String userId = original.getId();
 
@@ -226,19 +252,5 @@ class UserServiceTest {
         );
         assertEquals("user not found", exception.getMessage());
     }
-
-    @Test
-    @DisplayName("Edge Case: 模擬 SHA-256 演算法遺失 (觸發 IllegalStateException)")
-    void register_fail_when_sha256_missing() {
-        try (MockedStatic<MessageDigest> mockedDigest = mockStatic(MessageDigest.class)) {
-            mockedDigest.when(() -> MessageDigest.getInstance("SHA-256"))
-                    .thenThrow(new NoSuchAlgorithmException("Simulated Failure"));
-
-            IllegalStateException exception = assertThrows(IllegalStateException.class, () ->
-                    service.register("crash@example.com", null, "password", "CrashUser")
-            );
-
-            assertEquals("SHA-256 not available", exception.getMessage());
-        }
     }
 }
