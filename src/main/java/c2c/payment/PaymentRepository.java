@@ -6,7 +6,7 @@ import java.util.List;
 public interface PaymentRepository {
     Payment save(Payment payment);
 
-    Optional<Payment> findByOrderId(String orderId);
+//    Optional<Payment> findByOrderId(String orderId);
 
     List<Payment> findAll();
 }
