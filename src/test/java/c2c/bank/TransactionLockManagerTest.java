@@ -50,12 +50,12 @@ class TransactionLockManagerTest {
         AtomicBoolean thread1Locked = new AtomicBoolean(false);
         AtomicBoolean thread2Locked = new AtomicBoolean(false);
 
-        // 線程1先獲取鎖
+        // 執行緒1先獲取鎖
         Thread thread1 = new Thread(() -> {
             thread1Locked.set(lockManager.tryLock(lockKey, 1000));
-            latch1.countDown(); // 通知線程1已獲取鎖
+            latch1.countDown(); // 通知執行緒1已獲取鎖
             try {
-                latch2.await(); // 等待線程2嘗試獲取鎖後再釋放
+                latch2.await(); // 等待執行緒2嘗試獲取鎖後再釋放
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -63,17 +63,17 @@ class TransactionLockManagerTest {
         });
 
         thread1.start();
-        latch1.await(); // 等待線程1獲取鎖
+        latch1.await(); // 等待執行緒1獲取鎖
 
-        // Act - 線程2嘗試獲取同一個鎖 (應該失敗)
+        // Act - 執行緒2嘗試獲取同一個鎖 (應該失敗)
         thread2Locked.set(lockManager.tryLock(lockKey, 100)); // 短超時時間
-        latch2.countDown(); // 通知線程1可以釋放鎖
+        latch2.countDown(); // 通知執行緒1可以釋放鎖
 
         thread1.join();
 
         // Assert
-        assertTrue(thread1Locked.get(), "線程1應該成功獲取鎖");
-        assertFalse(thread2Locked.get(), "線程2應該無法獲取已被持有的鎖");
+        assertTrue(thread1Locked.get(), "執行緒1應該成功獲取鎖");
+        assertFalse(thread2Locked.get(), "執行緒2應該無法獲取已被持有的鎖");
     }
 
     @Test
@@ -113,7 +113,7 @@ class TransactionLockManagerTest {
     }
 
     @Test
-    @DisplayName("TL-005: 線程中斷時tryLock返回false")
+    @DisplayName("TL-005: 執行緒中斷時tryLock返回false")
     void TL005_testTryLockReturnsFalseWhenThreadInterrupted() throws InterruptedException {
         // Arrange
         String lockKey = "test";
@@ -123,22 +123,22 @@ class TransactionLockManagerTest {
         AtomicBoolean thread2Locked = new AtomicBoolean(false);
         AtomicBoolean thread2Interrupted = new AtomicBoolean(false);
 
-        // 線程1先獲取鎖並持有
+        // 執行緒1先獲取鎖並持有
         Thread thread1 = new Thread(() -> {
             thread1Locked.set(lockManager.tryLock(lockKey, 5000));
             latch1.countDown(); // 通知已獲取鎖
             try {
-                latch2.await(); // 等待線程2被中斷後再釋放
+                latch2.await(); // 等待執行緒2被中斷後再釋放
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             lockManager.unlock(lockKey);
         });
 
-        // 線程2嘗試獲取同一個鎖，並在等待時被中斷
+        // 執行緒2嘗試獲取同一個鎖，並在等待時被中斷
         Thread thread2 = new Thread(() -> {
             try {
-                latch1.await(); // 等待線程1獲取鎖
+                latch1.await(); // 等待執行緒1獲取鎖
                 thread2Locked.set(lockManager.tryLock(lockKey, 5000)); // 長超時，會被中斷
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
@@ -150,19 +150,19 @@ class TransactionLockManagerTest {
         thread1.start();
         thread2.start();
 
-        // 等待線程2開始嘗試獲取鎖
+        // 等待執行緒2開始嘗試獲取鎖
         Thread.sleep(100);
 
-        // 中斷線程2
+        // 中斷執行緒2
         thread2.interrupt();
-        latch2.countDown(); // 通知線程1可以釋放鎖
+        latch2.countDown(); // 通知執行緒1可以釋放鎖
 
         thread1.join();
         thread2.join();
 
         // Assert
-        assertTrue(thread1Locked.get(), "線程1應該成功獲取鎖");
-        assertFalse(thread2Locked.get(), "線程2在被中斷時應該返回false");
-        assertTrue(thread2Interrupted.get(), "線程2的中斷標誌應該被設置");
+        assertTrue(thread1Locked.get(), "執行緒1應該成功獲取鎖");
+        assertFalse(thread2Locked.get(), "執行緒2在被中斷時應該返回false");
+        assertTrue(thread2Interrupted.get(), "執行緒2的中斷標誌應該被設置");
     }
 }

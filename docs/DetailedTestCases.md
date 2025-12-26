@@ -158,14 +158,14 @@
 | PS-P-002 | 等價分割-有效類 | 支付成功 - CREDIT方式 | orderId: valid(PENDING), method: CREDIT, payerId: valid, cardNo: valid(balance sufficient) | 支付成功 | method==CREDIT 分支 |
 | PS-P-003 | 等價分割-無效類 | 支付失敗 - 訂單不存在 | orderId: invalid, method: DEBIT, payerId: valid, cardNo: valid | NotFoundException: "order not found" | findById失敗 分支 |
 | PS-P-004 | 等價分割-無效類 | 支付失敗 - 訂單狀態非PENDING | orderId: valid(PAID), method: DEBIT, payerId: valid, cardNo: valid | ValidationException: "order not payable" | status!=PENDING 分支 |
-| PS-P-005 | 併發測試 | 支付失敗 - 鎖定超時 | orderId: valid(PENDING), 同一lockKey被其他線程持有 | ValidationException: "payment lock timeout" | tryLock==false 分支 |
+| PS-P-005 | 併發測試 | 支付失敗 - 鎖定超時 | orderId: valid(PENDING), 同一lockKey被其他執行緒持有 | ValidationException: "payment lock timeout" | tryLock==false 分支 |
 | PS-P-006 | 等價分割-無效類 | 支付失敗 - 餘額不足 | orderId: valid(PENDING), method: DEBIT, payerId: valid, cardNo: valid(balance insufficient) | ValidationException: "insufficient balance" | checkBalance==false 分支 |
 | PS-P-007 | 等價分割-無效類 | 支付失敗 - 扣款失敗 | orderId: valid(PENDING), method: DEBIT, payerId: valid, cardNo: valid (debit returns false) | ValidationException: "debit failed" | debit==false 分支 |
 | PS-P-008 | 路徑測試 | 支付成功後交易記錄正確 | orderId: valid(PENDING), 支付成功 | TransactionLog記錄status=DEBITED, message="success" | transaction記錄路徑 |
 | PS-P-009 | 路徑測試 | 餘額不足時交易記錄正確 | orderId: valid(PENDING), 餘額不足 | TransactionLog記錄status=FAILED, message="insufficient balance" | transaction失敗記錄路徑 |
 | PS-P-010 | 路徑測試 | 扣款失敗時交易記錄正確 | orderId: valid(PENDING), 扣款失敗 | TransactionLog記錄status=FAILED, message="debit failed" | transaction失敗記錄路徑 |
 | PS-P-011 | 路徑測試 | 支付成功後訂單paymentId正確設置 | orderId: valid(PENDING), 支付成功 | order.paymentId == payment.id | paymentId設置路徑 |
-| PS-P-012 | 併發測試 | 兩個線程同時支付不同卡號成功 | 2個線程, 不同lockKey | 兩個支付都成功 | 不同lockKey可並行 |
+| PS-P-012 | 併發測試 | 兩個執行緒同時支付不同卡號成功 | 2個執行緒, 不同lockKey | 兩個支付都成功 | 不同lockKey可並行 |
 | PS-P-013 | 併發測試 | 鎖定後finally確保釋放 | 支付過程拋出異常 | 鎖必須被釋放 | finally unlock路徑 |
 
 ---
@@ -206,7 +206,7 @@
 | TL-002 | 併發測試 | 同一key第二次獲取鎖失敗 | lockKey: "test", 已被鎖定 | tryLock返回false | lock失敗分支 |
 | TL-003 | 路徑測試 | 釋放鎖成功 | lockKey: "test", 已鎖定 | unlock成功 | lock.isHeldByCurrentThread()==true |
 | TL-004 | 路徑測試 | 釋放未持有的鎖不拋異常 | lockKey: "test", 未持有 | 不拋異常 | lock==null 或 !isHeldByCurrentThread() 分支 |
-| TL-005 | 併發測試 | 線程中斷時返回false | lockKey: "test", 線程被中斷 | tryLock返回false, 中斷標誌設置 | InterruptedException分支 |
+| TL-005 | 併發測試 | 執行緒中斷時返回false | lockKey: "test", 執行緒被中斷 | tryLock返回false, 中斷標誌設置 | InterruptedException分支 |
 
 ---
 
@@ -379,7 +379,7 @@ mvn clean verify
 針對複雜的業務規則和條件組合，使用決策表列舉所有可能的條件和對應的動作。
 
 ### E. 併發測試
-測試多線程環境下的併發控制邏輯，如鎖機制、資源競爭等。
+測試多執行緒環境下的併發控制邏輯，如鎖機制、資源競爭等。
 
 ---
 

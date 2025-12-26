@@ -17,11 +17,11 @@ public class InMemoryPaymentRepository implements PaymentRepository {
         return payment;
     }
 
-    @Override
-    public Optional<Payment> findByOrderId(String orderId) {
-        String id = orderIndex.get(orderId);
-        return id == null ? Optional.empty() : Optional.ofNullable(storage.get(id));
-    }
+//    @Override
+//    public Optional<Payment> findByOrderId(String orderId) {
+//        String id = orderIndex.get(orderId);
+//        return id == null ? Optional.empty() : Optional.ofNullable(storage.get(id));
+//    }
 
     @Override
     public List<Payment> findAll() {
