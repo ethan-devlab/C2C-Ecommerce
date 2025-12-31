@@ -290,7 +290,7 @@ class PaymentServiceTest {
     }
 
     @Test
-    @DisplayName("PS-P-012: 併發測試 - 兩個線程同時支付不同卡號成功")
+    @DisplayName("PS-P-012: 併發測試 - 兩個執行緒同時支付不同卡號成功")
     void PS012_testConcurrentPaymentsWithDifferentCardsSucceed() throws InterruptedException {
         Order order1 = setupOrder("buyer1", 100.0, 5);
         Order order2 = setupOrder("buyer2", 150.0, 5);

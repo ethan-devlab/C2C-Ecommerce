@@ -4,7 +4,7 @@
 - **專案名稱**: C2C E-Commerce Platform
 - **測試目標**: 單元測試覆蓋率 >= 90% Branch Coverage
 - **測試案例數量目標**: >= 50 個單元測試
-- **測試方法**: 等價分割 (Equivalence Partitioning)、邊界值分析 (Boundary Value Analysis)、路徑測試 (Path Testing)、決策表測試 (Decision Table Testing)
+- **測試方法**: 等價分割 (Equivalence Partitioning)、邊界測試 (Boundary Value Testing)、路徑測試 (Path Testing)、決策表測試 (Decision Table Testing)
 
 ---
 
@@ -30,17 +30,17 @@
 
 #### 1.1 Register 功能測試
 
-**測試方法**: 等價分割、邊界值分析
+**測試方法**: 等價分割、邊界測試
 
 | 測試案例 ID | 測試方法 | 測試描述 | 輸入 | 預期結果 | 分支覆蓋 |
 |------------|---------|---------|------|---------|---------|
 | US-R-001 | 等價分割-有效類 | 註冊成功 - 完整資訊含電話 | email: valid, phone: valid, pwd: valid, name: valid | 註冊成功，返回User物件 | email!=null, password!=null, !existsByEmail, phone!=null, !existsByPhone |
 | US-R-002 | 等價分割-有效類 | 註冊成功 - 無電話號碼 | email: valid, phone: null, pwd: valid, name: valid | 註冊成功，返回User物件 | phone==null 分支 |
 | US-R-003 | 等價分割-無效類 | 註冊失敗 - email為null | email: null, phone: valid, pwd: valid, name: valid | ValidationException: "email is required" | email==null 分支 |
-| US-R-004 | 邊界值分析 | 註冊失敗 - email為空字串 | email: "", phone: valid, pwd: valid, name: valid | ValidationException: "email is required" | email.isBlank() 分支 |
-| US-R-005 | 邊界值分析 | 註冊失敗 - email為空白字串 | email: "   ", phone: valid, pwd: valid, name: valid | ValidationException: "email is required" | email.isBlank() 分支 |
+| US-R-004 | 邊界測試 | 註冊失敗 - email為空字串 | email: "", phone: valid, pwd: valid, name: valid | ValidationException: "email is required" | email.isBlank() 分支 |
+| US-R-005 | 邊界測試 | 註冊失敗 - email為空白字串 | email: "   ", phone: valid, pwd: valid, name: valid | ValidationException: "email is required" | email.isBlank() 分支 |
 | US-R-006 | 等價分割-無效類 | 註冊失敗 - password為null | email: valid, phone: valid, pwd: null, name: valid | ValidationException: "password is required" | password==null 分支 |
-| US-R-007 | 邊界值分析 | 註冊失敗 - password為空字串 | email: valid, phone: valid, pwd: "", name: valid | ValidationException: "password is required" | password.isBlank() 分支 |
+| US-R-007 | 邊界測試 | 註冊失敗 - password為空字串 | email: valid, phone: valid, pwd: "", name: valid | ValidationException: "password is required" | password.isBlank() 分支 |
 | US-R-008 | 等價分割-無效類 | 註冊失敗 - email重複 | email: existing, phone: valid, pwd: valid, name: valid | ConflictException: "email already registered" | existsByEmail==true 分支 |
 | US-R-009 | 等價分割-無效類 | 註冊失敗 - phone重複 | email: valid, phone: existing, pwd: valid, name: valid | ConflictException: "phone already registered" | phone!=null && existsByPhone==true 分支 |
 | US-R-010 | 路徑測試 | 註冊成功 - 特殊字元email | email: "test+tag@example.com", phone: null, pwd: valid, name: valid | 註冊成功 | 正常路徑 |
@@ -67,17 +67,17 @@
 
 #### 2.1 Create 功能測試
 
-**測試方法**: 等價分割、邊界值分析
+**測試方法**: 等價分割、邊界測試
 
 | 測試案例 ID | 測試方法 | 測試描述 | 輸入 | 預期結果 | 分支覆蓋 |
 |------------|---------|---------|------|---------|---------|
 | PS-C-001 | 等價分割-有效類 | 創建成功 - 所有參數有效 | title: "Product", desc: "desc", price: 100, stock: 10, cat: "cat" | 創建成功 | title!=null && !isBlank, price>=0, stock>=0 |
 | PS-C-002 | 等價分割-無效類 | 創建失敗 - title為null | title: null, desc: "desc", price: 100, stock: 10 | ValidationException: "title is required" | title==null 分支 |
-| PS-C-003 | 邊界值分析 | 創建失敗 - title為空字串 | title: "", desc: "desc", price: 100, stock: 10 | ValidationException: "title is required" | title.isBlank() 分支 |
-| PS-C-004 | 邊界值分析 | 創建失敗 - price為負數 | title: "Product", desc: "desc", price: -1, stock: 10 | ValidationException: "price/stock must be positive" | price<0 分支 |
-| PS-C-005 | 邊界值分析 | 創建失敗 - stock為負數 | title: "Product", desc: "desc", price: 100, stock: -1 | ValidationException: "price/stock must be positive" | stock<0 分支 |
-| PS-C-006 | 邊界值分析 | 創建成功 - price為0 | title: "Product", desc: "desc", price: 0, stock: 10 | 創建成功 | price==0 邊界 |
-| PS-C-007 | 邊界值分析 | 創建成功 - stock為0 | title: "Product", desc: "desc", price: 100, stock: 0 | 創建成功 | stock==0 邊界 |
+| PS-C-003 | 邊界測試 | 創建失敗 - title為空字串 | title: "", desc: "desc", price: 100, stock: 10 | ValidationException: "title is required" | title.isBlank() 分支 |
+| PS-C-004 | 邊界測試 | 創建失敗 - price為負數 | title: "Product", desc: "desc", price: -1, stock: 10 | ValidationException: "price/stock must be positive" | price<0 分支 |
+| PS-C-005 | 邊界測試 | 創建失敗 - stock為負數 | title: "Product", desc: "desc", price: 100, stock: -1 | ValidationException: "price/stock must be positive" | stock<0 分支 |
+| PS-C-006 | 邊界測試 | 創建成功 - price為0 | title: "Product", desc: "desc", price: 0, stock: 10 | 創建成功 | price==0 邊界 |
+| PS-C-007 | 邊界測試 | 創建成功 - stock為0 | title: "Product", desc: "desc", price: 100, stock: 0 | 創建成功 | stock==0 邊界 |
 
 #### 2.2 Update 功能測試
 
@@ -95,24 +95,24 @@
 
 #### 3.1 AddItem 功能測試
 
-**測試方法**: 等價分割、邊界值分析、決策表
+**測試方法**: 等價分割、邊界測試、決策表
 
 | 測試案例 ID | 測試方法 | 測試描述 | 輸入 | 預期結果 | 分支覆蓋 |
 |------------|---------|---------|------|---------|---------|
 | CS-A-001 | 等價分割-有效類 | 添加成功 - 商品活躍且庫存足夠 | userId: valid, productId: valid(ACTIVE, stock=10), qty: 5 | 添加成功 | product存在, status==ACTIVE, qty>0, stock>=qty |
 | CS-A-002 | 等價分割-無效類 | 添加失敗 - 商品不存在 | userId: valid, productId: invalid, qty: 1 | NotFoundException: "product not found" | findById失敗 分支 |
 | CS-A-003 | 等價分割-無效類 | 添加失敗 - 商品未啟用 | userId: valid, productId: valid(INACTIVE), qty: 1 | ValidationException: "product inactive" | status!=ACTIVE 分支 |
-| CS-A-004 | 邊界值分析 | 添加失敗 - 數量為0 | userId: valid, productId: valid(ACTIVE), qty: 0 | ValidationException: "quantity must be positive" | qty<=0 分支 |
-| CS-A-005 | 邊界值分析 | 添加失敗 - 數量為負數 | userId: valid, productId: valid(ACTIVE), qty: -1 | ValidationException: "quantity must be positive" | qty<=0 分支 |
+| CS-A-004 | 邊界測試 | 添加失敗 - 數量為0 | userId: valid, productId: valid(ACTIVE), qty: 0 | ValidationException: "quantity must be positive" | qty<=0 分支 |
+| CS-A-005 | 邊界測試 | 添加失敗 - 數量為負數 | userId: valid, productId: valid(ACTIVE), qty: -1 | ValidationException: "quantity must be positive" | qty<=0 分支 |
 | CS-A-006 | 等價分割-無效類 | 添加失敗 - 庫存不足 | userId: valid, productId: valid(ACTIVE, stock=5), qty: 10 | ValidationException: "insufficient stock" | stock<qty 分支 |
-| CS-A-007 | 邊界值分析 | 添加成功 - 數量等於庫存 | userId: valid, productId: valid(ACTIVE, stock=5), qty: 5 | 添加成功 | stock==qty 邊界 |
+| CS-A-007 | 邊界測試 | 添加成功 - 數量等於庫存 | userId: valid, productId: valid(ACTIVE, stock=5), qty: 5 | 添加成功 | stock==qty 邊界 |
 
 #### 3.2 UpdateQuantity 功能測試
 
 | 測試案例 ID | 測試方法 | 測試描述 | 輸入 | 預期結果 | 分支覆蓋 |
 |------------|---------|---------|------|---------|---------|
 | CS-U-001 | 等價分割-有效類 | 更新成功 - 新數量有效 | userId: valid, productId: valid(stock=10), qty: 8 | 更新成功 | qty>0, stock>=qty |
-| CS-U-002 | 邊界值分析 | 更新失敗 - 數量為0 | userId: valid, productId: valid, qty: 0 | ValidationException: "quantity must be positive" | qty<=0 分支 |
+| CS-U-002 | 邊界測試 | 更新失敗 - 數量為0 | userId: valid, productId: valid, qty: 0 | ValidationException: "quantity must be positive" | qty<=0 分支 |
 | CS-U-003 | 等價分割-無效類 | 更新失敗 - 庫存不足 | userId: valid, productId: valid(stock=5), qty: 10 | ValidationException: "insufficient stock" | stock<qty 分支 |
 | CS-U-004 | 等價分割-無效類 | 更新失敗 - 商品不存在 | userId: valid, productId: invalid, qty: 1 | NotFoundException: "product not found" | findById失敗 分支 |
 
@@ -131,7 +131,7 @@
 | OS-C-003 | 等價分割-無效類 | 創建失敗 - 購物車為空 | buyerId: valid, cart: [] | ValidationException: "cart is empty" | cart.isEmpty() 分支 |
 | OS-C-004 | 等價分割-無效類 | 創建失敗 - 商品不存在 | buyerId: valid, cart: [1 item with invalid productId] | NotFoundException: "product not found" | findById失敗 分支 |
 | OS-C-005 | 等價分割-無效類 | 創建失敗 - 庫存不足 | buyerId: valid, cart: [1 item, qty > stock] | ValidationException: "insufficient stock for product" | stock<qty 分支 |
-| OS-C-006 | 邊界值分析 | 創建成功 - 購買全部庫存 | buyerId: valid, cart: [1 item, qty == stock] | 訂單創建，庫存變0 | stock==qty 邊界 |
+| OS-C-006 | 邊界測試 | 創建成功 - 購買全部庫存 | buyerId: valid, cart: [1 item, qty == stock] | 訂單創建，庫存變0 | stock==qty 邊界 |
 
 #### 4.2 UpdateStatus 功能測試
 
@@ -174,19 +174,19 @@
 
 #### 6.1 AddReview 功能測試
 
-**測試方法**: 等價分割、邊界值分析、決策表
+**測試方法**: 等價分割、邊界測試、決策表
 
 | 測試案例 ID | 測試方法 | 測試描述 | 輸入 | 預期結果 | 分支覆蓋 |
 |------------|---------|---------|------|---------|---------|
 | RS-A-001 | 等價分割-有效類 | 添加評論成功 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 5, comment: "Great" | 評論創建成功 | rating 1-5, order存在, buyerId匹配, status==COMPLETED |
-| RS-A-002 | 邊界值分析 | 添加失敗 - rating為0 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 0, comment: "Bad" | ValidationException: "rating must be 1-5" | rating<1 分支 |
-| RS-A-003 | 邊界值分析 | 添加失敗 - rating為6 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 6, comment: "Bad" | ValidationException: "rating must be 1-5" | rating>5 分支 |
-| RS-A-004 | 邊界值分析 | 添加成功 - rating為1 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 1, comment: "Bad" | 評論創建成功 | rating==1 邊界 |
+| RS-A-002 | 邊界測試 | 添加失敗 - rating為0 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 0, comment: "Bad" | ValidationException: "rating must be 1-5" | rating<1 分支 |
+| RS-A-003 | 邊界測試 | 添加失敗 - rating為6 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 6, comment: "Bad" | ValidationException: "rating must be 1-5" | rating>5 分支 |
+| RS-A-004 | 邊界測試 | 添加成功 - rating為1 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 1, comment: "Bad" | 評論創建成功 | rating==1 邊界 |
 | RS-A-005 | 等價分割-無效類 | 添加失敗 - 訂單不存在 | orderId: invalid, productId: valid, buyerId: valid, rating: 5, comment: "Good" | ValidationException: "order not found" | findById失敗 分支 |
 | RS-A-006 | 等價分割-無效類 | 添加失敗 - buyerId不匹配 | orderId: valid(COMPLETED), productId: valid, buyerId: different, rating: 5, comment: "Good" | ValidationException: "buyer mismatch" | !buyerId.equals() 分支 |
 | RS-A-007 | 等價分割-無效類 | 添加失敗 - 訂單未完成(PENDING) | orderId: valid(PENDING), productId: valid, buyerId: match, rating: 5, comment: "Good" | ValidationException: "order not completed" | status!=COMPLETED 分支 |
 | RS-A-008 | 等價分割-無效類 | 添加失敗 - 訂單未完成(PAID) | orderId: valid(PAID), productId: valid, buyerId: match, rating: 5, comment: "Good" | ValidationException: "order not completed" | status!=COMPLETED 分支 |
-| RS-A-009 | 邊界值分析 | 添加成功 - rating為5 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 5, comment: "Excellent" | 評論創建成功 | rating==5 邊界 |
+| RS-A-009 | 邊界測試 | 添加成功 - rating為5 | orderId: valid(COMPLETED), productId: valid, buyerId: match, rating: 5, comment: "Excellent" | 評論創建成功 | rating==5 邊界 |
 
 #### 6.2 AverageRating 功能測試
 
@@ -232,7 +232,7 @@
 
 ### 9. BankService (FakeBankService) 測試案例 (6 個測試)
 
-**測試方法**: 等價分割、邊界值分析
+**測試方法**: 等價分割、邊界測試
 
 | 測試案例 ID | 測試方法 | 測試描述 | 輸入 | 預期結果 | 分支覆蓋 |
 |------------|---------|---------|------|---------|---------|
@@ -369,7 +369,7 @@ mvn clean verify
 ### A. 等價分割 (Equivalence Partitioning)
 將輸入數據劃分為有效等價類和無效等價類，每個等價類選擇一個代表性測試案例。
 
-### B. 邊界值分析 (Boundary Value Analysis)  
+### B. 邊界測試 (Boundary Value Testing)  
 測試輸入邊界值和邊界附近的值，如 0, -1, 1, 最大值, 最小值等。
 
 ### C. 路徑測試 (Path Testing)

@@ -41,7 +41,7 @@ class TransactionLockManagerTest {
 
 
     @Test
-    @DisplayName("TL-002: 已鎖定時獲取鎖失敗")
+    @DisplayName("TL-002: 同一key第二次獲取鎖失敗")
     void TL002_testTryLockFailsWhenAlreadyLocked() throws InterruptedException {
         // Arrange
         String lockKey = "test";
