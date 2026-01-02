@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="layout (pageTitle, content)">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${pageTitle}">C2C Platform</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+
+<body>
+    <div class="atmosphere"></div>
+    <header class="app-header">
+        <div class="brand">
+            <span class="brand-mark">C2C</span>
+            <div>
+                <p class="eyebrow">Community Commerce</p>
+                <h1>Marketplace Console</h1>
+            </div>
+        </div>
+        <nav class="primary-nav">
+            <a th:href="@{/}">Pulse</a>
+            <a th:href="@{/stats}">Insights</a>
+            <a th:href="@{/help}">Guide</a>
+            <a th:href="@{/users}">Users</a>
+            <a th:href="@{/products}">Products</a>
+            <a th:href="@{/cart}">Cart</a>
+            <a th:href="@{/orders}">Orders</a>
+            <a th:href="@{/payments}">Payments</a>
+            <a th:href="@{/reviews}">Reviews</a>
+        </nav>
+        <div class="session-info" th:if="${currentUser != null}">
+            <p>Signed in as <span th:text="${currentUser.name}">Admin</span></p>
+            <a class="ghost-btn" th:href="@{/logout}">Logout</a>
+        </div>
+        <div class="session-info" th:if="${currentUser == null}">
+            <p>Guest session</p>
+            <a class="ghost-btn" th:href="@{/login}">Login</a>
+        </div>
+    </header>
+    <section class="flash-wrapper">
+        <div class="flash success" th:if="${success}" th:text="${success}"></div>
+        <div class="flash danger" th:if="${error}" th:text="${error}"></div>
+    </section>
+    <main th:insert="${content}"></main>
+    <footer class="app-footer">
+        <p>Built for the Software Testing course &mdash; handcrafted UI powered by Spring Boot &amp; Thymeleaf.</p>
+    </footer>
+</body>
+
+</html>

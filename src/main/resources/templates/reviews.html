@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Reviews</title>
+</head>
+
+<body th:replace="layout :: layout ('Reviews', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Voice of Buyers</h2>
+            <p>Capture and inspect post-purchase reviews.</p>
+        </div>
+        <div class="two-col">
+            <div class="card">
+                <h3>Select Product</h3>
+                <form method="get" th:action="@{/reviews}">
+                    <div>
+                        <label>Product</label>
+                        <select name="productId">
+                            <option value="">Choose</option>
+                            <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.title}"
+                                th:selected="${selectedProduct == product.id}"></option>
+                        </select>
+                    </div>
+                    <button type="submit">Load Reviews</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Add Review</h3>
+                <form method="post" th:action="@{/reviews/add}">
+                    <div>
+                        <label>Order (completed)</label>
+                        <select name="orderId" required>
+                            <option value="">Select order</option>
+                            <option th:each="order : ${completedOrders}" th:value="${order.id}" th:text="${order.id}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Product</label>
+                        <select name="productId" required>
+                            <option value="">Select product</option>
+                            <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.title}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Buyer</label>
+                        <input name="buyerId" placeholder="Buyer ID" required>
+                    </div>
+                    <div>
+                        <label>Rating (1-5)</label>
+                        <input type="number" min="1" max="5" name="rating" required>
+                    </div>
+                    <div>
+                        <label>Comment</label>
+                        <textarea name="comment" required></textarea>
+                    </div>
+                    <button type="submit">Submit Review</button>
+                </form>
+            </div>
+        </div>
+        <div class="card" style="margin-top: 2rem;" th:if="${selectedProduct}">
+            <h3 th:text="${'Reviews for ' + selectedProduct}">Reviews</h3>
+            <p th:if="${rating}">Average Rating: <strong th:text="${#numbers.formatDecimal(rating, 1, 1)}"></strong></p>
+            <div class="table-shell" th:if="${!#lists.isEmpty(reviews)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Buyer</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="review : ${reviews}">
+                            <td th:text="${review.buyerId}">buyer</td>
+                            <td th:text="${review.rating}">5</td>
+                            <td th:text="${review.comment}">comment</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p th:if="${#lists.isEmpty(reviews)}">No reviews available.</p>
+        </div>
+    </section>
+</body>
+
+</html>

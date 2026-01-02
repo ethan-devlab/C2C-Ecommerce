@@ -65,11 +65,30 @@ public class DefaultOrderService implements OrderService {
     @Override
     public Result<Order> updateStatus(String orderId, OrderStatus toStatus) {
         Order order = orderRepository.findById(orderId).orElseThrow(() -> new NotFoundException("order not found"));
-        if (!OrderStatusMachine.canTransit(order.getStatus(), toStatus)) {
+        OrderStatus currentStatus = order.getStatus();
+        if (currentStatus == toStatus) {
+            return Result.ok(order);
+        }
+        if (!OrderStatusMachine.canTransit(currentStatus, toStatus)) {
             throw new ValidationException("invalid status transition");
         }
+        boolean shouldRestoreInventory = (toStatus == OrderStatus.CANCELED || toStatus == OrderStatus.REFUNDED)
+                && currentStatus != OrderStatus.CANCELED && currentStatus != OrderStatus.REFUNDED;
         order.setStatus(toStatus);
         orderRepository.save(order);
+        if (shouldRestoreInventory) {
+            restoreInventory(order);
+        }
         return Result.ok(order);
+    }
+
+    private void restoreInventory(Order order) {
+        List<OrderItem> items = order.getItems();
+        for (OrderItem item : items) {
+            Product product = productRepository.findById(item.getProductId())
+                    .orElseThrow(() -> new NotFoundException("product not found"));
+            product.setStock(product.getStock() + item.getQuantity());
+            productRepository.save(product);
+        }
     }
 }

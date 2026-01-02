@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Order Detail</title>
+</head>
+
+<body th:replace="layout :: layout ('Order Detail', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2 th:text="${'Order ' + order.id}">Order</h2>
+            <p>Buyer: <strong th:text="${order.buyerId}"></strong></p>
+        </div>
+        <div class="two-col">
+            <div class="card">
+                <h3>Summary</h3>
+                <p><strong>Total:</strong> <span th:text="${order.amount}">$0</span></p>
+                <p><strong>Status:</strong> <span class="badge" th:text="${order.status}"
+                        th:classappend="${' ' + #strings.toLowerCase(order.status.name())}"></span></p>
+                <p><strong>Created:</strong> <span th:text="${order.createdAt}"></span></p>
+                <p><strong>Updated:</strong> <span th:text="${order.updatedAt}"></span></p>
+            </div>
+            <div class="card">
+                <h3>Update Status</h3>
+                <form th:action="@{/orders/status}" method="post">
+                    <input type="hidden" name="orderId" th:value="${order.id}">
+                    <div>
+                        <label>Status</label>
+                        <select name="status">
+                            <option th:each="status : ${orderStatuses}" th:value="${status}" th:text="${status}"
+                                th:selected="${status == order.status}"></option>
+                        </select>
+                    </div>
+                    <button type="submit">Apply</button>
+                </form>
+            </div>
+        </div>
+        <div class="card" style="margin-top: 2rem;">
+            <h3>Order Items</h3>
+            <div class="table-shell">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Seller ID</th>
+                            <th>Quantity</th>
+                            <th>Unit Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${order.items}">
+                            <td th:text="${item.titleSnapshot}">Product Name</td>
+                            <td th:text="${item.sellerId}">Seller</td>
+                            <td th:text="${item.quantity}">1</td>
+                            <td th:text="${'$' + #numbers.formatDecimal(item.priceSnapshot, 1, 2)}">$0.00</td>
+                            <td th:text="${'$' + #numbers.formatDecimal(item.quantity * item.priceSnapshot, 1, 2)}">$0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card" style="margin-top: 2rem;">
+            <h3>Payments</h3>
+            <div class="table-shell" th:if="${#lists.isEmpty(payments)}">
+                <p style="padding: 1rem;">No payments yet.</p>
+            </div>
+            <div class="table-shell" th:if="${!#lists.isEmpty(payments)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Method</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="payment : ${payments}">
+                            <td th:text="${payment.id}">PAY</td>
+                            <td th:text="${payment.method}">DEBIT</td>
+                            <td th:text="${payment.status}">status</td>
+                            <td th:text="${payment.createdAt}">time</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

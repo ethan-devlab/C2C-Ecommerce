@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Product Detail</title>
+</head>
+
+<body th:replace="layout :: layout ('Product Detail', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2 th:text="${product.title}">Product</h2>
+            <p><strong>Seller:</strong> <span th:text="${product.sellerId}"></span></p>
+        </div>
+        <div class="two-col">
+            <div class="card">
+                <h3>Listing</h3>
+                <p th:text="${product.description}">Description</p>
+                <p><strong>Price:</strong> <span th:text="${product.price}"></span></p>
+                <p><strong>Stock:</strong> <span th:text="${product.stock}"></span></p>
+                <p><strong>Status:</strong> <span class="badge" th:text="${product.status}"
+                        th:classappend="${' ' + #strings.toLowerCase(product.status.name())}"></span></p>
+                <p><strong>Average Rating:</strong> <span th:text="${#numbers.formatDecimal(rating, 1, 1)}"></span></p>
+            </div>
+            <div class="card">
+                <h3>Update Listing</h3>
+                <form th:action="@{'/products/' + ${product.id} + '/update'}" method="post">
+                    <div>
+                        <label>Title</label>
+                        <input name="title" th:value="${product.title}" required>
+                    </div>
+                    <div>
+                        <label>Description</label>
+                        <textarea name="description" th:text="${product.description}" required></textarea>
+                    </div>
+                    <div>
+                        <label>Price</label>
+                        <input type="number" step="0.01" min="0" name="price" th:value="${product.price}" required>
+                    </div>
+                    <div>
+                        <label>Stock</label>
+                        <input type="number" min="0" name="stock" th:value="${product.stock}" required>
+                    </div>
+                    <div>
+                        <label>Category</label>
+                        <input name="category" th:value="${product.category}" required>
+                    </div>
+                    <div>
+                        <label>Status</label>
+                        <select name="status" required>
+                            <option th:each="ps : ${productStatuses}" th:value="${ps}" th:text="${ps}"
+                                th:selected="${ps == product.status}"></option>
+                        </select>
+                    </div>
+                    <button type="submit">Update Listing</button>
+                </form>
+            </div>
+        </div>
+        <div class="card" style="margin-top: 2rem;">
+            <h3>Reviews</h3>
+            <div class="table-shell" th:if="${#lists.isEmpty(reviews)}">
+                <p style="padding: 1rem;">No reviews yet.</p>
+            </div>
+            <div class="table-shell" th:if="${!#lists.isEmpty(reviews)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Buyer</th>
+                            <th>Rating</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="review : ${reviews}">
+                            <td th:text="${review.buyerId}">buyer</td>
+                            <td th:text="${review.rating}">5</td>
+                            <td th:text="${review.comment}">comment</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

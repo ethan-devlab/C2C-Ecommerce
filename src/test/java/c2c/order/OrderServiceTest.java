@@ -121,7 +121,7 @@ class OrderServiceTest {
             // Given: 先成功添加商品到購物車，然後減少庫存使其不足
             Product product = productService.create("seller", "Book", "desc", 20.0, 5, "cat").getData();
             cartService.addItem("buyer", product.getId(), 3);
-            
+
             // 手動減少庫存至不足以滿足訂單
             product.setStock(2);
             productRepository.save(product);
@@ -208,6 +208,47 @@ class OrderServiceTest {
             // When & Then: 拋出NotFoundException
             assertThrows(NotFoundException.class,
                     () -> orderService.updateStatus(invalidOrderId, OrderStatus.PAID));
+        }
+
+        @Test
+        @DisplayName("OS-U-005: 取消訂單會恢復庫存")
+        void updateStatus_restoreStockWhenCanceled() {
+            Order order = createTestOrder();
+            String productId = order.getItems().get(0).getProductId();
+            int stockAfterPurchase = productRepository.findById(productId).orElseThrow().getStock();
+
+            orderService.updateStatus(order.getId(), OrderStatus.CANCELED);
+
+            int expectedStock = stockAfterPurchase + order.getItems().stream().mapToInt(OrderItem::getQuantity).sum();
+            assertEquals(expectedStock, productRepository.findById(productId).orElseThrow().getStock());
+        }
+
+        @Test
+        @DisplayName("OS-U-006: 退款訂單會恢復庫存")
+        void updateStatus_restoreStockWhenRefunded() {
+            Order order = createTestOrder();
+            String productId = order.getItems().get(0).getProductId();
+            int stockAfterPurchase = productRepository.findById(productId).orElseThrow().getStock();
+
+            orderService.updateStatus(order.getId(), OrderStatus.PAID);
+            orderService.updateStatus(order.getId(), OrderStatus.REFUNDED);
+
+            int expectedStock = stockAfterPurchase + order.getItems().stream().mapToInt(OrderItem::getQuantity).sum();
+            assertEquals(expectedStock, productRepository.findById(productId).orElseThrow().getStock());
+        }
+
+        @Test
+        @DisplayName("OS-U-007: 重複取消不會重複補貨")
+        void updateStatus_noDoubleRestoreOnRepeatedCancellation() {
+            Order order = createTestOrder();
+            String productId = order.getItems().get(0).getProductId();
+
+            orderService.updateStatus(order.getId(), OrderStatus.CANCELED);
+            int stockAfterFirstCancel = productRepository.findById(productId).orElseThrow().getStock();
+
+            orderService.updateStatus(order.getId(), OrderStatus.CANCELED);
+
+            assertEquals(stockAfterFirstCancel, productRepository.findById(productId).orElseThrow().getStock());
         }
 
         @ParameterizedTest(name = "有效狀態轉換: {0} → {1}")

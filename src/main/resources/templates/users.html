@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Users</title>
+</head>
+
+<body th:replace="layout :: layout ('Users', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Members</h2>
+            <p>Manage every buyer or seller profile from one pane.</p>
+        </div>
+        <div class="two-col">
+            <div class="card">
+                <h3>Register User</h3>
+                <form method="post" th:action="@{/users/register}">
+                    <div>
+                        <label>Name</label>
+                        <input name="name" required>
+                    </div>
+                    <div>
+                        <label>Email</label>
+                        <input type="email" name="email" required>
+                    </div>
+                    <div>
+                        <label>Phone</label>
+                        <input name="phone" placeholder="optional">
+                    </div>
+                    <div>
+                        <label>Password</label>
+                        <input type="password" name="password" required>
+                    </div>
+                    <button type="submit">Create User</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Tip</h3>
+                <p>Click a user row to open the profile for editing and to view their order history.</p>
+            </div>
+        </div>
+        <div class="table-shell" style="margin-top: 2rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.id}">USER</td>
+                        <td th:text="${user.name}">Name</td>
+                        <td th:text="${user.email}">email</td>
+                        <td th:text="${user.phone}">phone</td>
+                        <td><a class="ghost-btn" th:href="@{'/users/' + ${user.id}}">Profile</a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</body>
+
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Insights</title>
+</head>
+
+<body th:replace="layout :: layout ('Marketplace Insights', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Operations Insights</h2>
+            <p>Blend of commerce telemetry for auditing growth, conversion, and fulfillment cadence.</p>
+        </div>
+        <div class="metric-grid">
+            <div class="card">
+                <h4>Total Users</h4>
+                <p class="value" th:text="${userCount}">0</p>
+            </div>
+            <div class="card">
+                <h4>Total Products</h4>
+                <p class="value" th:text="${productCount}">0</p>
+            </div>
+            <div class="card">
+                <h4>Total Orders</h4>
+                <p class="value" th:text="${orderCount}">0</p>
+            </div>
+            <div class="card">
+                <h4>Total Payments</h4>
+                <p class="value" th:text="${paymentCount}">0</p>
+            </div>
+            <div class="card">
+                <h4>GMV</h4>
+                <p class="value" th:text="${#numbers.formatDecimal(totalSales, 1, 2)}">0</p>
+            </div>
+            <div class="card">
+                <h4>Pending Orders</h4>
+                <p class="value" th:text="${pendingOrders}">0</p>
+            </div>
+            <div class="card">
+                <h4>Completed Orders</h4>
+                <p class="value" th:text="${completedOrders}">0</p>
+            </div>
+            <div class="card">
+                <h4>Total Stock</h4>
+                <p class="value" th:text="${totalStock}">0</p>
+            </div>
+            <div class="card">
+                <h4>Out of Stock</h4>
+                <p class="value" th:text="${outOfStock}">0</p>
+            </div>
+        </div>
+        <div class="hero-slab">
+            <h3>Status Breakdown</h3>
+            <div class="status-grid">
+                <div class="card" th:each="entry : ${statusBreakdown}">
+                    <h4 th:text="${entry.key}">STATUS</h4>
+                    <p class="value" th:text="${entry.value}">0</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>
