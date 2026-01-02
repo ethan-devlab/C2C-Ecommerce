@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>User Detail</title>
+</head>
+
+<body th:replace="layout :: layout ('User Detail', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2 th:text="${user.name}">User</h2>
+            <p th:text="${user.email}">email</p>
+        </div>
+        <div class="two-col">
+            <div class="card">
+                <h3>Profile</h3>
+                <p><strong>ID:</strong> <span th:text="${user.id}"></span></p>
+                <p><strong>Phone:</strong> <span th:text="${user.phone}">n/a</span></p>
+                <form th:action="@{'/users/' + ${user.id} + '/update'}" method="post">
+                    <div>
+                        <label>Name</label>
+                        <input name="name" th:value="${user.name}" required>
+                    </div>
+                    <div>
+                        <label>Phone</label>
+                        <input name="phone" th:value="${user.phone}">
+                    </div>
+                    <button type="submit">Save Profile</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Recent Orders</h3>
+                <div class="table-shell" th:if="${#lists.isEmpty(userOrders)}">
+                    <p style="padding: 1rem;">No purchases yet.</p>
+                </div>
+                <div class="table-shell" th:if="${!#lists.isEmpty(userOrders)}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${userOrders}">
+                                <td><a th:href="@{'/orders/' + ${order.id}}" th:text="${order.id}">ORD</a></td>
+                                <td th:text="${order.amount}">$0</td>
+                                <td><span class="badge"
+                                        th:classappend="${' ' + #strings.toLowerCase(order.status.name())}"
+                                        th:text="${order.status}"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

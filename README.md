@@ -13,5 +13,13 @@ See [ArchitectureDesign.md](docs/ArchitectureDesign.md) for detailed architectur
 ## Software Requirement Specification (SRS)
 See [SRS.md](docs/SRS.md) for the Software Requirement Specification document.
 
+## Java Version
+* Java JDK 23
+
+## Running the Application
+```
+mvn spring-boot:run
+```
+
 ## License
 This project is part of an educational exercise (Feng Chia University, year 114, semester 1, Software Testing) and is provided as-is without any warranty. Feel free to use and modify it for learning purposes.

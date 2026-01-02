@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Pulse Dashboard</title>
+</head>
+
+<body th:replace="layout :: layout ('Marketplace Pulse', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Pulse Dashboard</h2>
+            <p>Live summary of community commerce health across users, listings, orders, and payment velocity.</p>
+        </div>
+        <div class="metric-grid">
+            <div class="card">
+                <h4>Active Users</h4>
+                <p class="value" th:text="${userCount}">0</p>
+            </div>
+            <div class="card">
+                <h4>Listings Live</h4>
+                <p class="value" th:text="${productCount}">0</p>
+            </div>
+            <div class="card">
+                <h4>Orders Placed</h4>
+                <p class="value" th:text="${orderCount}">0</p>
+            </div>
+            <div class="card">
+                <h4>Payments Logged</h4>
+                <p class="value" th:text="${paymentCount}">0</p>
+            </div>
+            <div class="card">
+                <h4>Pending Orders</h4>
+                <p class="value" th:text="${pendingOrders}">0</p>
+            </div>
+        </div>
+        <div class="two-col">
+            <div class="hero-slab">
+                <h3>Latest Orders</h3>
+                <div class="table-shell" th:if="${#lists.isEmpty(latestOrders)}">
+                    <p style="padding: 1.5rem;">No orders yet &mdash; create one from the Cart page.</p>
+                </div>
+                <div class="table-shell" th:if="${!#lists.isEmpty(latestOrders)}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Buyer</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="order : ${latestOrders}">
+                                <td><a th:href="@{'/orders/' + ${order.id}}" th:text="${order.id}">ORD</a></td>
+                                <td th:text="${order.buyerId}">buyer</td>
+                                <td th:text="${order.amount}">$0</td>
+                                <td>
+                                    <span class="badge"
+                                        th:classappend="${' ' + #strings.toLowerCase(order.status.name())}"
+                                        th:text="${order.status}">STATUS</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="hero-slab">
+                <h3>Spotlight Products</h3>
+                <ul class="highlight-list" th:if="${!#lists.isEmpty(spotlightProducts)}">
+                    <li th:each="product : ${spotlightProducts}">
+                        <strong th:text="${product.title}">Product</strong>
+                        <p th:text="${product.description}">Description</p>
+                        <div class="table-actions">
+                            <span class="badge paid" th:text="${#numbers.formatDecimal(product.price, 1, 2)}">$0</span>
+                            <span class="badge" th:text="${product.category}">Category</span>
+                            <a class="ghost-btn" th:href="@{'/products/' + ${product.id}}">View</a>
+                        </div>
+                    </li>
+                </ul>
+                <p th:if="${#lists.isEmpty(spotlightProducts)}">Add products to see them featured here.</p>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

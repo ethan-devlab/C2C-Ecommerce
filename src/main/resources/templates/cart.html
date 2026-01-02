@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Cart</title>
+</head>
+
+<body th:replace="layout :: layout ('Cart', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Cart Manager</h2>
+            <p>Simulate shopper carts and prep them for order creation.</p>
+        </div>
+        <div class="two-col">
+            <div class="card">
+                <h3>Select User</h3>
+                <form method="get" th:action="@{/cart}">
+                    <div>
+                        <label>User</label>
+                        <select name="userId" required>
+                            <option value="">Choose</option>
+                            <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"
+                                th:selected="${selectedUser == user.id}"></option>
+                        </select>
+                    </div>
+                    <button type="submit">Load Cart</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Add Item</h3>
+                <form method="post" th:action="@{/cart/add}">
+                    <input type="hidden" name="userId" th:value="${selectedUser}">
+                    <div>
+                        <label>Product</label>
+                        <select name="productId" required>
+                            <option value="">Pick product</option>
+                            <option th:each="product : ${products}" th:value="${product.id}" th:text="${product.title}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Quantity</label>
+                        <input type="number" min="1" name="quantity" value="1" required>
+                    </div>
+                    <button type="submit">Add to Cart</button>
+                </form>
+            </div>
+        </div>
+        <div class="card" style="margin-top: 2rem;" th:if="${selectedUser}">
+            <h3 th:text="${'Cart for ' + selectedUser}">Cart Items</h3>
+            <div class="table-shell" th:if="${cartItems == null or #lists.isEmpty(cartItems)}">
+                <p style="padding: 1rem;">No items yet.</p>
+            </div>
+            <div class="table-shell" th:if="${cartItems != null and !#lists.isEmpty(cartItems)}">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Total</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="item : ${cartItems}">
+                            <td th:text="${item.productId}">product</td>
+                            <td>
+                                <form class="table-actions" th:action="@{/cart/update}" method="post">
+                                    <input type="hidden" name="userId" th:value="${selectedUser}">
+                                    <input type="hidden" name="productId" th:value="${item.productId}">
+                                    <input type="number" name="quantity" min="1" th:value="${item.quantity}"
+                                        style="width: 80px;">
+                                    <button type="submit">Update</button>
+                                </form>
+                            </td>
+                            <td th:text="${item.priceSnapshot}">$0</td>
+                            <td th:text="${item.quantity * item.priceSnapshot}">$0</td>
+                            <td>
+                                <form th:action="@{/cart/remove}" method="post">
+                                    <input type="hidden" name="userId" th:value="${selectedUser}">
+                                    <input type="hidden" name="productId" th:value="${item.productId}">
+                                    <button type="submit" class="ghost-btn">Remove</button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <p style="text-align: right; font-size: 1.2rem;">Cart Total: <strong th:text="${cartTotal}">$0</strong></p>
+        </div>
+    </section>
+</body>
+
+</html>

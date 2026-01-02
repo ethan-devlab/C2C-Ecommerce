@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Orders</title>
+</head>
+
+<body th:replace="layout :: layout ('Orders', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Orders Control</h2>
+            <p>Review fulfillment progress and trigger status transitions safely.</p>
+        </div>
+        <div class="two-col">
+            <div class="card">
+                <h3>Filter</h3>
+                <form th:action="@{/orders}" method="get">
+                    <div>
+                        <label>Buyer</label>
+                        <select name="buyerId">
+                            <option value="">All buyers</option>
+                            <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"
+                                th:selected="${selectedBuyer == user.id}"></option>
+                        </select>
+                    </div>
+                    <button type="submit">Apply</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Create Order</h3>
+                <form th:action="@{/orders/create}" method="post">
+                    <div>
+                        <label>Buyer (cart owner)</label>
+                        <select name="buyerId" required>
+                            <option value="">Select buyer</option>
+                            <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                        </select>
+                    </div>
+                    <button type="submit">Create from Cart</button>
+                </form>
+            </div>
+        </div>
+        <div class="table-shell" style="margin-top: 2rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Buyer</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="order : ${orders}">
+                        <td><a th:href="@{'/orders/' + ${order.id}}" th:text="${order.id}">ORD</a></td>
+                        <td th:text="${order.buyerId}">buyer</td>
+                        <td th:text="${order.amount}">$0</td>
+                        <td><span class="badge" th:classappend="${' ' + #strings.toLowerCase(order.status.name())}"
+                                th:text="${order.status}"></span></td>
+                        <td th:text="${order.updatedAt}">time</td>
+                        <td>
+                            <form class="table-actions" th:action="@{/orders/status}" method="post">
+                                <input type="hidden" name="orderId" th:value="${order.id}">
+                                <select name="status">
+                                    <option th:each="status : ${orderStatuses}" th:value="${status}"
+                                        th:text="${status}"></option>
+                                </select>
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</body>
+
+</html>

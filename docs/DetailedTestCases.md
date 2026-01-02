@@ -118,7 +118,7 @@
 
 ---
 
-### 4. OrderService 測試案例 (10 個測試)
+### 4. OrderService 測試案例 (13 個測試)
 
 #### 4.1 CreateFromCart 功能測試
 
@@ -143,6 +143,9 @@
 | OS-U-002 | 決策表 | 狀態轉換成功 - PENDING→CANCELED | orderId: valid(status=PENDING), toStatus: CANCELED | 狀態更新成功 | canTransit(PENDING, CANCELED)==true |
 | OS-U-003 | 決策表 | 狀態轉換失敗 - PENDING→COMPLETED | orderId: valid(status=PENDING), toStatus: COMPLETED | ValidationException: "invalid status transition" | canTransit()==false 分支 |
 | OS-U-004 | 等價分割-無效類 | 更新失敗 - 訂單不存在 | orderId: invalid, toStatus: PAID | NotFoundException: "order not found" | findById失敗 分支 |
+| OS-U-005 | 路徑測試 | 取消訂單會恢復庫存 | orderId: valid(status=PENDING), toStatus: CANCELED | 狀態更新為CANCELED，商品庫存增加 | shouldRestoreInventory==true, toStatus==CANCELED, restoreInventory執行 |
+| OS-U-006 | 路徑測試 | 退款訂單會恢復庫存 | orderId: valid(status=PAID), toStatus: REFUNDED | 狀態更新為REFUNDED，商品庫存增加 | shouldRestoreInventory==true, toStatus==REFUNDED, restoreInventory執行 |
+| OS-U-007 | 路徑測試 | 重複取消不會重複補貨 | orderId: valid(status=CANCELED), toStatus: CANCELED | 狀態不變，庫存不變 | currentStatus==toStatus, shouldRestoreInventory==false |
 
 ---
 
@@ -254,15 +257,15 @@
 | UserService | 14 |
 | ProductService | 12 |
 | CartService | 11 |
-| OrderService | 10 |
+| OrderService | 13 |
 | PaymentService | 13 |
 | ReviewService | 10 |
 | TransactionLockManager | 5 |
 | OrderStatusMachine | 11 |
 | BankService | 6 |
-| **總計** | **92** |
+| **總計** | **95** |
 
-✅ **達成目標**: 總測試數 92 > 50
+✅ **達成目標**: 總測試數 95 > 50
 
 ### 分支覆蓋率預估
 

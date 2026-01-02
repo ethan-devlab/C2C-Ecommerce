@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Sign In</title>
+</head>
+
+<body th:replace="layout :: layout ('Sign In', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Welcome Back</h2>
+            <p>Use any registered user credentials to explore authenticated flows.</p>
+        </div>
+        <div class="two-col">
+            <form action="#" method="post" th:action="@{/login}" class="card">
+                <div>
+                    <label>Email</label>
+                    <input name="email" type="email" placeholder="email@marketplace.com" required>
+                </div>
+                <div>
+                    <label>Password</label>
+                    <input name="password" type="password" placeholder="••••••" required>
+                </div>
+                <button type="submit">Sign In</button>
+            </form>
+            <div class="hero-slab">
+                <h3>Need credentials?</h3>
+                <p>Register a new operator from the Users page. This UI does not enforce roles, so any account may log
+                    in.</p>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

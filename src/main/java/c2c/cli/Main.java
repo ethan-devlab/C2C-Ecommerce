@@ -840,9 +840,15 @@ public class Main {
         String orderId = parts[1];
         OrderStatus status = OrderStatus.valueOf(parts[2].toUpperCase());
 
+        OrderStatus previousStatus = orderService.get(orderId).getData().getStatus();
         Result<Order> result = orderService.updateStatus(orderId, status);
         Order order = result.getData();
         printSuccess("Order status updated to " + order.getStatus());
+        if ((status == OrderStatus.CANCELED || status == OrderStatus.REFUNDED)
+                && previousStatus != status) {
+            int restoredUnits = order.getItems().stream().mapToInt(OrderItem::getQuantity).sum();
+            printInfo("Inventory restored for " + restoredUnits + " item(s).");
+        }
     }
 
     // ==================== Payment Commands ====================

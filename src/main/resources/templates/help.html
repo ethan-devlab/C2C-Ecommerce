@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Guide</title>
+</head>
+
+<body th:replace="layout :: layout ('Operator Guide', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Operator Guide</h2>
+            <p>Every CLI action now has a visual counterpart. Use this quick reference while exploring the UI.</p>
+        </div>
+        <div class="two-col">
+            <div class="hero-slab">
+                <h3>Core Flow</h3>
+                <ul class="clean">
+                    <li><strong>Register Users:</strong> Users page → form.</li>
+                    <li><strong>Create Listings:</strong> Products page → "Add New Listing".</li>
+                    <li><strong>Add to Cart:</strong> Cart page → select user/product.</li>
+                    <li><strong>Create Order:</strong> Orders page → "Create from Cart".</li>
+                    <li><strong>Collect Payment:</strong> Payments page → choose pending order.</li>
+                    <li><strong>Review Products:</strong> Reviews page → select completed order.</li>
+                </ul>
+            </div>
+            <div class="hero-slab">
+                <h3>Shortcuts</h3>
+                <ul class="clean">
+                    <li><strong>Dashboard:</strong> Snapshot of everything.</li>
+                    <li><strong>Insights:</strong> Deeper analytics and counts.</li>
+                    <li><strong>Cart:</strong> Manage items, quantities, removals.</li>
+                    <li><strong>Orders:</strong> Update statuses with guard rails.</li>
+                    <li><strong>Payments:</strong> Run debit/credit with optimistic locks.</li>
+                    <li><strong>Reviews:</strong> Pull buyer sentiment per listing.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <title>Payments</title>
+</head>
+
+<body th:replace="layout :: layout ('Payments', ~{::section})">
+    <section>
+        <div class="page-intro">
+            <h2>Payments Desk</h2>
+            <p>Trigger card authorizations and review transaction logs.</p>
+        </div>
+        <div class="two-col">
+            <div class="card">
+                <h3>Run Payment</h3>
+                <form th:action="@{/payments/pay}" method="post">
+                    <div>
+                        <label>Order</label>
+                        <select name="orderId" required>
+                            <option value="">Pending orders</option>
+                            <option th:each="order : ${pendingOrders}" th:value="${order.id}" th:text="${order.id}">
+                            </option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Method</label>
+                        <select name="method" required>
+                            <option value="DEBIT">DEBIT</option>
+                            <option value="CREDIT">CREDIT</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Payer</label>
+                        <select name="payerId" required>
+                            <option value="">Select user</option>
+                            <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.name}"></option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Card Number</label>
+                        <input name="cardNumber" placeholder="CARD-1" required>
+                    </div>
+                    <button type="submit">Charge Card</button>
+                </form>
+            </div>
+            <div class="card">
+                <h3>Filter Transactions</h3>
+                <form method="get" th:action="@{/payments}">
+                    <div>
+                        <label>Order ID</label>
+                        <input name="orderId" th:value="${filterOrderId}">
+                    </div>
+                    <button type="submit">Apply</button>
+                </form>
+            </div>
+        </div>
+        <div class="table-shell" style="margin-top: 2rem;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Order</th>
+                        <th>Method</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="payment : ${payments}">
+                        <td th:text="${payment.id}">PAY</td>
+                        <td th:text="${payment.orderId}">ORD</td>
+                        <td th:text="${payment.method}">DEBIT</td>
+                        <td th:text="${payment.status}">SUCCESS</td>
+                        <td th:text="${payment.createdAt}">time</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</body>
+
+</html>
